@@ -1,0 +1,3 @@
+scripts/grid eol=lf
+scripts/produce-text-data.sh eol=lf
+*.sh eol=lf
