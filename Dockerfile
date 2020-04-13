@@ -43,12 +43,13 @@ RUN	echo "==> Samza Grid Script: Install script dependency" && \
 
 #################################
 # Install Software
-# listener kafka property is changed to localhost otherwise there is no response
+# listener kafka property is changed to 0.0.0.0 to answer on all interface and localhost for the client
 #################################
 RUN	echo "==> Install Zookeeper and Kafka into ${FQDN}" && \
     $SAMZA_HOME/scripts/grid install zookeeper && \
     $SAMZA_HOME/scripts/grid install kafka && \
-    sed -i "s/\#listeners=PLAINTEXT:\/\/:9092/listeners=PLAINTEXT:\/\/${FQDN}:9092/" $SAMZA_HOME/deploy/kafka/config/server.properties
+    sed -i "s/\#listeners=PLAINTEXT:\/\/:9092/listeners=PLAINTEXT:\/\/0.0.0.0:9092/" $SAMZA_HOME/deploy/kafka/config/server.properties && \
+    sed -i "s/\#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092/advertised.listeners=PLAINTEXT:\/\/localhost:9092/" $SAMZA_HOME/deploy/kafka/config/server.properties
 
 #################################
 # Working Directory

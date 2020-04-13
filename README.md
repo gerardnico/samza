@@ -1,8 +1,14 @@
 # Samza Demo Code
 
 
-## Docker
+## Docker Samza Grid
 
+A Samza grid comprises three different systems: 
+  * [YARN](http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/YARN.html), 
+  * [Kafka](http://kafka.apache.org/), 
+  * and [ZooKeeper](http://zookeeper.apache.org/). 
+
+Steps:
   * Build 
 ```dos
 docker build -t "gerardnico/samza-grid:1.0" .
@@ -66,6 +72,7 @@ From [Quick Start Word Count Project](http://samza.apache.org/startup/quick-star
 
   * Create the topic, add data and verify
 ```bash
+kafka-topics.sh --zookeeper localhost:2181 --list
 kafka-topics.sh --create --zookeeper localhost:2181 --topic sample-text --partition 1 --replication-factor 1
 kafka-console-producer.sh --topic sample-text --broker localhost:9092 < ./data/sample-text.txt
 kafka-console-consumer.sh --topic sample-text --bootstrap-server localhost:9092 --from-beginning
@@ -77,12 +84,14 @@ kafka-console-consumer.sh --topic sample-text --bootstrap-server localhost:9092 
   * Verify the stream output
 ```bash
 kafka-console-consumer.sh --topic word-count-output --bootstrap-server localhost:9092 --from-beginning
+kafka-console-consumer.sh --topic word-count-1-window-count --bootstrap-server localhost:9092 --from-beginning
 ```
 
 ### Hello Samza
 
 Not yet done
 
+  * [Doc](http://samza.apache.org/startup/code-examples/latest/samza.html)
   * [Hello Samza](http://samza.apache.org/startup/hello-samza/0.10/)
   
 

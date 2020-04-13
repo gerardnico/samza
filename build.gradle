@@ -33,7 +33,7 @@ dependencies {
 
     explode (group: 'org.apache.samza', name: 'samza-shell',  ext: 'tgz', classifier: 'dist', version: "$SAMZA_VERSION")
 
-    runtime(group: 'org.apache.samza', name: 'samza-log4j', version: "$SAMZA_VERSION")
+    //runtime(group: 'org.apache.samza', name: 'samza-log4j', version: "$SAMZA_VERSION")
     runtime(group: 'org.apache.samza', name: 'samza-shell', version: "$SAMZA_VERSION")
     runtime(group: 'org.apache.samza', name: 'samza-yarn_2.11', version: "$SAMZA_VERSION")
 }

@@ -3,6 +3,8 @@ package samzaapp;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.apache.samza.config.Config;
 import org.apache.samza.operators.KV;
 import org.apache.samza.operators.MessageStream;
 import org.apache.samza.operators.OutputStream;
+import org.apache.samza.operators.windows.WindowPane;
 import org.apache.samza.operators.windows.Windows;
 import org.apache.samza.runtime.ApplicationRunner;
 import org.apache.samza.runtime.LocalApplicationRunner;
@@ -35,10 +38,10 @@ public class WordCount implements StreamApplication {
     /**
      * Consumer Configs
      */
-    final Map<String, String> CONSUMER_CONFIGS = ImmutableMap.of("socket.timeout.ms","10000");
+    //final Map<String, String> CONSUMER_CONFIGS = ImmutableMap.of("socket.timeout.ms", "10000");
 
     private static final String INPUT_STREAM_ID = "sample-text";
-    private static final String OUTPUT_STREAM_ID = "word-count-output";
+    private static final String OUTPUT_STREAM_ID = "word-count-output-2";
 
     @Override
     public void describe(StreamApplicationDescriptor streamApplicationDescriptor) {
@@ -51,7 +54,7 @@ public class WordCount implements StreamApplication {
         KafkaSystemDescriptor kafkaSystemDescriptor = new KafkaSystemDescriptor(KAFKA_SYSTEM_NAME)
                 .withConsumerZkConnect(KAFKA_CONSUMER_ZK_CONNECT)
                 .withProducerBootstrapServers(KAFKA_PRODUCER_BOOTSTRAP_SERVERS)
-                .withConsumerConfigs(CONSUMER_CONFIGS)
+                //.withConsumerConfigs(CONSUMER_CONFIGS)
                 .withDefaultStreamConfigs(KAFKA_DEFAULT_STREAM_CONFIGS);
 
         System.out.println("Input Stream");
@@ -70,32 +73,71 @@ public class WordCount implements StreamApplication {
 
         System.out.println("Stream Processing");
         inputLines
-                .map(kv -> kv.value) // return the lines
-                .flatMap(s -> Arrays.asList(s.split("\\W+"))) // Split by space
-                .window(
-                        Windows.keyedSessionWindow(
-                                w -> w, // The key
-                                Duration.ofSeconds(5), // Duration
-                                () -> 0, // initial value
-                                (m, prevCount) -> prevCount + 1, // agg function
-                                new StringSerde(), // Key Serde Object
-                                new IntegerSerde() // Value Serde Object
-                        ),
-                        "count" // unique id of the operator
-                )
-                .map(windowPane ->
-                        KV.of(
-                                windowPane.getKey().getKey(), // Key
-                                windowPane.getKey().getKey() + ": " + windowPane.getMessage().toString() // Value
-                        )
+                .map(kv -> {
+                    System.out.println("Line: " + kv.value);
+                    return kv.value;
+                }) // return the lines
+                .flatMap(s -> {
+                    List<String> split = Arrays.asList(s.split("\\W+"));
+                    System.out.println("Split: " + split);
+                    return split;
+                }) // Split by space
+                .map(s -> {
+                    System.out.println(s);
+                    return s;
+                })
+//                .window(
+//                        Windows.keyedSessionWindow(
+//                                w -> w, // The key
+//                                // Session Time Gap
+//                                // A session is considered complete when no new messages arrive within the sessionGap.
+//                                // All messages that arrive within the gap are grouped into the same session
+//                                Duration.ofSeconds(60),
+//                                () -> 0, // initial value
+//                                (m, prevCount) -> prevCount + 1, // agg function
+//                                new StringSerde(), // Key Serde Object
+//                                new IntegerSerde() // Value Serde Object
+//                        ),
+//                        "count" // unique id of the operator
+//                );
+//        System.out.println("Yolo");
+//        wordCount.map(windowPane -> {
+//                            System.out.println("Key" + windowPane.getKey().getKey());
+//                            return KV.of(
+//                                    windowPane.getKey().getKey(), // Key
+//                                    windowPane.getKey().getKey() + ": " + windowPane.getMessage().toString() // Value
+//                            );
+//                        }
+//                )
+//                .map(s->{
+//                    System.out.println(s.getKey());
+//                    return s;
+//                })
+                .map(s -> {
+                            System.out.println("Key" + s);
+                            return KV.of(s,s);
+                        }
                 )
                 .sendTo(counts);
 
     }
 
+    /**
+     * Executes the application using the local application runner.
+     * It takes two required command line arguments
+     * config-factory: a fully {@link org.apache.samza.config.factories.PropertiesConfigFactory} class name
+     * config-path: path to application properties
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
+
+        String[] arg = {
+                "--config-path", Paths.get("src/main/config/word-count.properties").toUri().toString(),
+                "--config-factory", "org.apache.samza.config.factories.PropertiesConfigFactory"
+        };
         CommandLine cmdLine = new CommandLine();
-        OptionSet options = cmdLine.parser().parse(args);
+        OptionSet options = cmdLine.parser().parse(arg);
         Config config = cmdLine.loadConfig(options);
         WordCount app = new WordCount();
         LocalApplicationRunner runner = new LocalApplicationRunner(app, config);
