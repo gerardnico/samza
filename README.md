@@ -86,7 +86,10 @@ grid
 ## Code
 
 ### Word Count
+
 From [Quick Start Word Count Project](http://samza.apache.org/startup/quick-start/latest/samza.html)
+
+
 
   * Create the topic, add data and verify
 ```bash
@@ -95,14 +98,13 @@ kafka-topics.sh --create --zookeeper localhost:2181 --topic sample-text --partit
 kafka-console-producer.sh --topic sample-text --broker-list localhost:9092 < ./data/sample-text.txt
 kafka-console-consumer.sh --topic sample-text --bootstrap-server localhost:9092 --from-beginning
 ```
-  * Start the main with the following args:
+  * Start the main with the following args (??? Run but does not produce any data because of the window transformation ???)
 ```bash
---config-path file://D:/code/samza-gh/src/main/config/word-count.properties
+--config-factory=org.apache.samza.config.factories.PropertiesConfigFactory --config-path file://D:/code/samza-gh/src/main/config/word-count.properties
 ```
   * Verify the stream output
 ```bash
 kafka-console-consumer.sh --topic word-count-output --bootstrap-server localhost:9092 --from-beginning
-kafka-console-consumer.sh --topic word-count-1-window-count --bootstrap-server localhost:9092 --from-beginning
 ```
 
 ### Hello Samza
