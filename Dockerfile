@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 #################################
 # Sys Install
@@ -34,22 +34,13 @@ RUN	echo "==> Samza Grid Script: Install script dependency" && \
 # Samza Grid Script Install Script
 #################################
 ADD scripts $SAMZA_HOME/scripts
+ADD gradle.properties $SAMZA_HOME
 RUN	echo "==> Samza Grid Script: Install script dependency" && \
     apt-get install -y default-jdk && \
     apt-get install -y git && \
     apt-get install -y maven && \
     apt-get install -y curl && \
     chmod +x $SAMZA_HOME/scripts/grid
-
-#################################
-# Install Software
-# listener kafka property is changed to 0.0.0.0 to answer on all interface and localhost for the client
-#################################
-RUN	echo "==> Install Zookeeper and Kafka into ${FQDN}" && \
-    $SAMZA_HOME/scripts/grid install zookeeper && \
-    $SAMZA_HOME/scripts/grid install kafka && \
-    sed -i "s/\#listeners=PLAINTEXT:\/\/:9092/listeners=PLAINTEXT:\/\/0.0.0.0:9092/" $SAMZA_HOME/deploy/kafka/config/server.properties && \
-    sed -i "s/\#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092/advertised.listeners=PLAINTEXT:\/\/localhost:9092/" $SAMZA_HOME/deploy/kafka/config/server.properties
 
 #################################
 # Working Directory
@@ -59,8 +50,27 @@ RUN echo "==> Creating the working directory" && \
 WORKDIR $WORKDIR
 
 #################################
+# Port exposed for --net host
+#################################
+EXPOSE 22
+EXPOSE 2181
+EXPOSE 9092
+EXPOSE 8032
+EXPOSE 8042
+
+##################################
+## Install Software
+## listener kafka property is changed to 0.0.0.0 to answer on all interface and localhost for the client
+##################################
+#RUN	echo "==> Install Zookeeper and Kafka into ${FQDN}" && \
+#    $SAMZA_HOME/scripts/grid install all && \
+#    sed -i "s/\#listeners=PLAINTEXT:\/\/:9092/listeners=PLAINTEXT:\/\/0.0.0.0:9092/" $SAMZA_HOME/deploy/kafka/config/server.properties && \
+#    sed -i "s/\#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092/advertised.listeners=PLAINTEXT:\/\/localhost:9092/" $SAMZA_HOME/deploy/kafka/config/server.properties
+
+#################################
 # Start Container Script
 #################################
-ENTRYPOINT /usr/sbin/sshd -D & ; $SAMZA_HOME/scripts/grid start zookeeper ; $SAMZA_HOME/scripts/grid start kafka ; sleep infinity
+#ENTRYPOINT /usr/sbin/sshd -D & ; $SAMZA_HOME/scripts/grid start all ; sleep infinity
 
+ENTRYPOINT /usr/sbin/sshd -D
 

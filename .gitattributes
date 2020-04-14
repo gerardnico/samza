@@ -1,3 +1,6 @@
 scripts/grid eol=lf
 scripts/produce-text-data.sh eol=lf
 *.sh eol=lf
+# gradle.properties is used as sh scripts
+# to set the version and tag properties
+gradle.properties
