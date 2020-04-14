@@ -18,6 +18,7 @@ docker run ^
     -p 9092:9092 ^
     -p 8032:8032 ^
     -p 8042:8042 ^
+    -p 8080:8088 ^
     -v %cd%:/workdir ^
     gerardnico/samza-grid:%SAMZA_VERSION%
 
@@ -26,5 +27,6 @@ REM where:
 REM   * ZOOKEEPER_PORT=2181
 REM   * RESOURCEMANAGER_PORT=8032
 REM   * NODEMANAGER_PORT=8042
+REM   * YARNUI_PORT=8088
 REM   * KAFKA_PORT=9092
 REM   * SSHD=22

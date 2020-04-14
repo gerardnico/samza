@@ -88,7 +88,7 @@ public class SessionWindowExample implements StreamApplication, Serializable {
     private static final String OUTPUT_STREAM_ID = "pageview-session-output";
 
     @Override
-    public void describe(StreamApplicationDescriptor appDescriptor) {
+    public void describe(StreamApplicationDescriptor streamApplicationDescriptor) {
         Serde<String> stringSerde = new StringSerde();
         KVSerde<String, PageView> pageViewKVSerde = KVSerde.of(stringSerde, new JsonSerdeV2<>(PageView.class));
         KVSerde<String, UserPageViews> userPageViewSerde = KVSerde.of(stringSerde, new JsonSerdeV2<>(UserPageViews.class));
@@ -103,10 +103,10 @@ public class SessionWindowExample implements StreamApplication, Serializable {
         KafkaOutputDescriptor<KV<String, UserPageViews>> userPageViewsOutputDescriptor =
                 kafkaSystemDescriptor.getOutputDescriptor(OUTPUT_STREAM_ID, userPageViewSerde);
 
-        appDescriptor.withDefaultSystem(kafkaSystemDescriptor);
+        streamApplicationDescriptor.withDefaultSystem(kafkaSystemDescriptor);
 
-        MessageStream<KV<String, PageView>> pageViews = appDescriptor.getInputStream(pageViewInputDescriptor);
-        OutputStream<KV<String, UserPageViews>> userPageViews = appDescriptor.getOutputStream(userPageViewsOutputDescriptor);
+        MessageStream<KV<String, PageView>> pageViews = streamApplicationDescriptor.getInputStream(pageViewInputDescriptor);
+        OutputStream<KV<String, UserPageViews>> userPageViews = streamApplicationDescriptor.getOutputStream(userPageViewsOutputDescriptor);
 
         pageViews
                 .partitionBy(

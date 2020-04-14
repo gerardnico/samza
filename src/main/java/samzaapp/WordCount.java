@@ -56,6 +56,7 @@ public class WordCount implements StreamApplication {
                 .withProducerBootstrapServers(KAFKA_PRODUCER_BOOTSTRAP_SERVERS)
                 //.withConsumerConfigs(CONSUMER_CONFIGS)
                 .withDefaultStreamConfigs(KAFKA_DEFAULT_STREAM_CONFIGS);
+        streamApplicationDescriptor.withDefaultSystem(kafkaSystemDescriptor);
 
         System.out.println("Input Stream");
         KafkaInputDescriptor<KV<String, String>> inputDescriptor = kafkaSystemDescriptor.getInputDescriptor(

@@ -106,19 +106,18 @@ install_all_without_yarn() {
 install_samza() {
   echo "Building samza ${SAMZA_TAG} from master..."
   mkdir -p "$DEPLOY_ROOT_DIR"
-  if [ -d "$DOWNLOAD_CACHE_DIR/samza/.git" ]; then
-    pushd "$DOWNLOAD_CACHE_DIR/samza"
+  if [ -d "$DEPLOY_ROOT_DIR/samza/.git" ]; then
+    pushd "$DEPLOY_ROOT_DIR/samza"
     git fetch origin
     git reset --hard origin/master
   else
-    mkdir -p $DOWNLOAD_CACHE_DIR
-    pushd $DOWNLOAD_CACHE_DIR
+    mkdir -p $DEPLOY_ROOT_DIR
+    pushd $DEPLOY_ROOT_DIR
     git clone https://gitbox.apache.org/repos/asf/samza.git
     cd samza
   fi
   git checkout tags/${SAMZA_TAG}
-  JAVA_OPTS="-Dfile.encoding=utf-8"
-  JAVA_TOOL_OPTIONS=="-Dfile.encoding=utf-8"
+  # ./gradlew clean build -x test
   ./gradlew -PscalaSuffix=${SCALA_VERSION} clean publishToMavenLocal
   popd
 }
@@ -129,6 +128,7 @@ install_zookeeper() {
   cp "$DEPLOY_ROOT_DIR/zookeeper/conf/zoo_sample.cfg" "$DEPLOY_ROOT_DIR/zookeeper/conf/zoo.cfg"
 }
 
+# https://samza.apache.org/learn/tutorials/0.14/samza-tools.html
 install_samza_tool() {
   mkdir -p "$DEPLOY_ROOT_DIR"
   install samzatool $DOWNLOAD_SAMZA_TOOL $SAMZA_TOOL_PACKAGE

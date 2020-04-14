@@ -64,6 +64,7 @@ EXPOSE 2181
 EXPOSE 9092
 EXPOSE 8032
 EXPOSE 8042
+EXPOSE 8088
 
 ##################################
 ## Install Software

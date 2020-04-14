@@ -107,12 +107,20 @@ kafka-console-consumer.sh --topic word-count-1-window-count --bootstrap-server l
 
 ### Hello Samza
 
-Not yet done
+```bash
+git clone https://gitbox.apache.org/repos/asf/samza-hello-samza.git hello-samza
+cd hello-samza
+git checkout latest
+```
 
+Not yet done
+  * [Samza](http://samza.apache.org/learn/tutorials/latest/hello-samza-high-level-yarn.html)
   * [Doc](http://samza.apache.org/startup/code-examples/latest/samza.html)
   * [Hello Samza](http://samza.apache.org/startup/hello-samza/0.10/)
   
 
+### Tutorial
 
+http://samza.apache.org/learn/tutorials/latest/
 
   
