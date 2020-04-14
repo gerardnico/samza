@@ -91,8 +91,8 @@ From [Quick Start Word Count Project](http://samza.apache.org/startup/quick-star
   * Create the topic, add data and verify
 ```bash
 kafka-topics.sh --zookeeper localhost:2181 --list
-kafka-topics.sh --create --zookeeper localhost:2181 --topic sample-text --partition 1 --replication-factor 1
-kafka-console-producer.sh --topic sample-text --broker localhost:9092 < ./data/sample-text.txt
+kafka-topics.sh --create --zookeeper localhost:2181 --topic sample-text --partitions 1 --replication-factor 1
+kafka-console-producer.sh --topic sample-text --broker-list localhost:9092 < ./data/sample-text.txt
 kafka-console-consumer.sh --topic sample-text --bootstrap-server localhost:9092 --from-beginning
 ```
   * Start the main with the following args:

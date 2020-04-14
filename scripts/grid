@@ -52,8 +52,17 @@ KAFKA_PACKAGE="kafka_${SCALA_VERSION}-${KAFKA_VERSION}"
 DOWNLOAD_KAFKA="https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/${KAFKA_PACKAGE}.tgz"
 YARN_PACKAGE="hadoop-${YARN_VERSION}"
 DOWNLOAD_YARN="https://archive.apache.org/dist/hadoop/common/${YARN_PACKAGE}/${YARN_PACKAGE}.tar.gz"
-ZOOKEEPER_PACKAGE="zookeeper-3.4.14"
+ZOOKEEPER_PACKAGE="zookeeper-${ZK_VERSION}"
 DOWNLOAD_ZOOKEEPER="https://archive.apache.org/dist/zookeeper/${ZOOKEEPER_PACKAGE}/${ZOOKEEPER_PACKAGE}.tar.gz"
+
+if [ "${SAMZA_VERSION}" == "1.4.0" ]; then
+  SAMZA_TOOL_PACKAGE="samza-tools-1.3.1" # 1.4.1 not available
+  DOWNLOAD_SAMZA_TOOL="https://downloads.apache.org/samza/1.3.1/samza-tools_${SCALA_VERSION}-1.3.1.tgz"
+else
+  SAMZA_TOOL_PACKAGE="samza-tools_${SCALA_VERSION}-${SAMZA_VERSION}"
+  DOWNLOAD_SAMZA_TOOL="https://downloads.apache.org/samza/${SAMZA_VERSION}/${SAMZA_TOOL_PACKAGE}.tgz"
+fi
+
 
 SERVICE_WAIT_TIMEOUT_SEC=20
 ZOOKEEPER_PORT=2181
@@ -118,6 +127,11 @@ install_zookeeper() {
   mkdir -p "$DEPLOY_ROOT_DIR"
   install zookeeper $DOWNLOAD_ZOOKEEPER $ZOOKEEPER_PACKAGE
   cp "$DEPLOY_ROOT_DIR/zookeeper/conf/zoo_sample.cfg" "$DEPLOY_ROOT_DIR/zookeeper/conf/zoo.cfg"
+}
+
+install_samza_tool() {
+  mkdir -p "$DEPLOY_ROOT_DIR"
+  install samzatool $DOWNLOAD_SAMZA_TOOL $SAMZA_TOOL_PACKAGE
 }
 
 install_yarn() {
@@ -273,7 +287,7 @@ elif (test -z "$COMMAND" && test -z "$SYSTEM") \
   echo "  $ grid"
   echo "  $ grid bootstrap"
   echo "  $ grid standalone"
-  echo "  $ grid install [yarn|kafka|zookeeper|samza|all]"
+  echo "  $ grid install [yarn|kafka|zookeeper|samza|samza_tool|all]"
   echo "  $ grid start [yarn|kafka|zookeeper|all]"
   echo "  $ grid stop [yarn|kafka|zookeeper|all]"
   echo

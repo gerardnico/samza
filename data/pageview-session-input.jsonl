@@ -1,0 +1,6 @@
+{"userId": "user1", "country": "india", "pageId":"google.com/home"}
+{"userId": "user1", "country": "india", "pageId":"google.com/search"}
+{"userId": "user2", "country": "china", "pageId":"yahoo.com/home"}
+{"userId": "user2", "country": "china", "pageId":"yahoo.com/sports"}
+{"userId": "user1", "country": "india", "pageId":"google.com/news"}
+{"userId": "user2", "country": "china", "pageId":"yahoo.com/fashion"}

@@ -86,38 +86,32 @@ public class WordCount implements StreamApplication {
                     System.out.println(s);
                     return s;
                 })
-//                .window(
-//                        Windows.keyedSessionWindow(
-//                                w -> w, // The key
-//                                // Session Time Gap
-//                                // A session is considered complete when no new messages arrive within the sessionGap.
-//                                // All messages that arrive within the gap are grouped into the same session
-//                                Duration.ofSeconds(60),
-//                                () -> 0, // initial value
-//                                (m, prevCount) -> prevCount + 1, // agg function
-//                                new StringSerde(), // Key Serde Object
-//                                new IntegerSerde() // Value Serde Object
-//                        ),
-//                        "count" // unique id of the operator
-//                );
-//        System.out.println("Yolo");
-//        wordCount.map(windowPane -> {
-//                            System.out.println("Key" + windowPane.getKey().getKey());
-//                            return KV.of(
-//                                    windowPane.getKey().getKey(), // Key
-//                                    windowPane.getKey().getKey() + ": " + windowPane.getMessage().toString() // Value
-//                            );
-//                        }
-//                )
-//                .map(s->{
-//                    System.out.println(s.getKey());
-//                    return s;
-//                })
-                .map(s -> {
-                            System.out.println("Key" + s);
-                            return KV.of(s,s);
+                .window(
+                        Windows.keyedSessionWindow(
+                                w -> w, // The key
+                                // Session Time Gap
+                                // A session is considered complete when no new messages arrive within the sessionGap.
+                                // All messages that arrive within the gap are grouped into the same session
+                                Duration.ofSeconds(60),
+                                () -> 0, // initial value
+                                (m, prevCount) -> prevCount + 1, // agg function
+                                new StringSerde(), // Key Serde Object
+                                new IntegerSerde() // Value Serde Object
+                        ),
+                        "count" // unique id of the operator
+                ).map(windowPane -> {
+                            System.out.println("Key" + windowPane.getKey().getKey());
+                            return KV.of(
+                                    windowPane.getKey().getKey(), // Key
+                                    windowPane.getKey().getKey() + ": " + windowPane.getMessage().toString() // Value
+                            );
                         }
                 )
+//                .map(s -> {
+//                            System.out.println("Key" + s);
+//                            return KV.of(s,s);
+//                        }
+//                )
                 .sendTo(counts);
 
     }
@@ -132,12 +126,12 @@ public class WordCount implements StreamApplication {
      */
     public static void main(String[] args) {
 
-        String[] arg = {
+        String[] samzaArgs = {
                 "--config-path", Paths.get("src/main/config/word-count.properties").toUri().toString(),
                 "--config-factory", "org.apache.samza.config.factories.PropertiesConfigFactory"
         };
         CommandLine cmdLine = new CommandLine();
-        OptionSet options = cmdLine.parser().parse(arg);
+        OptionSet options = cmdLine.parser().parse(samzaArgs);
         Config config = cmdLine.loadConfig(options);
         WordCount app = new WordCount();
         LocalApplicationRunner runner = new LocalApplicationRunner(app, config);

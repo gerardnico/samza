@@ -45,6 +45,7 @@ import org.apache.samza.util.CommandLine;
 import samzaapp.data.PageView;
 import samzaapp.data.UserPageViews;
 
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ import java.util.Map;
  * <ol>
  *   <li>
  *     Ensure that the topic "pageview-session-input" is created  <br/>
- *     ./deploy/kafka/bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic pageview-session-input --partitions 2 --replication-factor 1
+ *     kafka-topics.sh --zookeeper localhost:2181 --create --topic pageview-session-input --partitions 2 --replication-factor 1
  *   </li>
  *   <li>
  *     Run the application using the run-app.sh script <br/>
@@ -68,13 +69,8 @@ import java.util.Map;
  *   </li>
  *   <li>
  *     Produce some messages to the "pageview-session-input" topic <br/>
- *     ./deploy/kafka/bin/kafka-console-producer.sh --topic pageview-session-input --broker-list localhost:9092 <br/>
- *     {"userId": "user1", "country": "india", "pageId":"google.com/home"} <br/>
- *     {"userId": "user1", "country": "india", "pageId":"google.com/search"} <br/>
- *     {"userId": "user2", "country": "china", "pageId":"yahoo.com/home"} <br/>
- *     {"userId": "user2", "country": "china", "pageId":"yahoo.com/sports"} <br/>
- *     {"userId": "user1", "country": "india", "pageId":"google.com/news"} <br/>
- *     {"userId": "user2", "country": "china", "pageId":"yahoo.com/fashion"}
+ *     kafka-console-producer.sh --topic pageview-session-input --broker-list localhost:9092 < ./data/pageview-session-input.jsonl
+ *
  *   </li>
  *   <li>
  *     Consume messages from the "pageview-session-output" topic (e.g. bin/kafka-console-consumer.sh)
@@ -129,8 +125,13 @@ public class SessionWindowExample implements StreamApplication, Serializable {
     }
 
     public static void main(String[] args) {
+
+        String[] samzaArg = {
+                "--config-path", Paths.get("src/main/config/session-window-example.properties").toUri().toString(),
+                "--config-factory", "org.apache.samza.config.factories.PropertiesConfigFactory"
+        };
         CommandLine cmdLine = new CommandLine();
-        OptionSet options = cmdLine.parser().parse(args);
+        OptionSet options = cmdLine.parser().parse(samzaArg);
         Config config = cmdLine.loadConfig(options);
         SessionWindowExample app = new SessionWindowExample();
         LocalApplicationRunner runner = new LocalApplicationRunner(app, config);
