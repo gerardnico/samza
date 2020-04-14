@@ -8,7 +8,7 @@ This directory contains
 
 ## Version
 
-Version of the components (Yarn, Zookeeper, )can be seen in the [gradle.properties](gradle.properties) 
+Version of the components (Yarn, Zookeeper, Samza, Kafka )can be seen in the [gradle.properties](gradle.properties) 
 
 ## Docker Samza Grid
 
@@ -32,15 +32,19 @@ docker-samza-run.bat
 
 From your laptop, with [ncat](https://gerardnico.com/network/netcat), you can verify that you have access to the services from your laptop
 ```dos
+ncat -z localhost 22 && echo tcp connection to sshd succeeded
 ncat -z localhost 2181 && echo tcp connection to zookeeper succeeded
 ncat -z localhost 9092 && echo tcp connection to kafka succeeded
-ncat -z localhost 22 && echo tcp connection to sshd succeeded
+ncat -z localhost 8032 && echo tcp connection to resource manager succeeded
+ncat -z localhost 8042 && echo tcp connection to node manager succeeded
 ```
-You should see
+You should see:
 ```text
+tcp connection to sshd succeeded
 tcp connection to zookeeper succeeded
 tcp connection to kafka succeeded
-tcp connection to sshd succeeded
+tcp connection to resource manager succeeded
+tcp connection to node manager succeeded
 ```
 
 ### Connection with bash
@@ -56,7 +60,7 @@ You can connect via ssh with the user `root` and the password `welcome`.
 
 ### Start and stop service
 
-The software are installed in `/usr/local/samza/deploy/`
+The software are installed in `/opt/samza/deploy/`
 
 In the container, the [grid](./scripts/grid) script permits to start and stop services. 
 ```bash

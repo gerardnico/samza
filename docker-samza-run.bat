@@ -13,7 +13,7 @@ docker run ^
     -p 9092:9092 ^
     -p 8032:8032 ^
     -p 8042:8042 ^
-    -v %cd%:/samza ^
+    -v %cd%:/workdir ^
     gerardnico/samza-grid:1.0
 
 
