@@ -3,12 +3,14 @@
 ## About
 
 This directory contains
-  * a samza grid docker image (to work also on windows)
-  * samza demo code
+  * a samza grid docker image (to work with Samza also on windows)
+  * and some samza demo code
 
 ## Version
 
-Version of the components (Yarn, Zookeeper, Samza, Kafka )can be seen in the [gradle.properties](gradle.properties) 
+Actual version is Samza 1.4.0
+
+The version of the components (Yarn, Zookeeper, Samza, Kafka) can be seen in the [gradle.properties](gradle.properties) 
 
 ## Docker Samza Grid
 
@@ -19,11 +21,11 @@ A Samza grid comprises three different systems:
 
 ### Build and create the container
 Steps:
-  * Build 
+  * Build with [Dockerbuild.bat](Dockerbuild.bat)
 ```dos
-docker build -t "gerardnico/samza-grid:1.0" .
+Dockerbuild.bat
 ```
-  * Create the container
+  * Create the container with [docker-samza-run.bat](docker-samza-run.bat)
 ```dos
 docker-samza-run.bat
 ```
@@ -49,7 +51,7 @@ tcp connection to node manager succeeded
 
 ### Connection with bash
 
-  * Connect in the container wit bash
+  * Connect in the container wit bash and [docker-samza-bash.bat](docker-samza-bash.bat)
 ```bash
 docker-samza-bash.bat
 ```

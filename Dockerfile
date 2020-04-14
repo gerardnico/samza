@@ -82,6 +82,6 @@ RUN	echo "==> Change Kafka configuration to answer on ${FQDN}" && \
 #################################
 # Start Container Script
 #################################
-ENTRYPOINT /usr/sbin/sshd -D & ; $SAMZA_HOME/scripts/grid start all ; sleep infinity
+ENTRYPOINT /usr/sbin/sshd -D & $SAMZA_HOME/scripts/grid start all ; sleep infinity
 
 

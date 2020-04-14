@@ -5,6 +5,11 @@ ECHO Create the container
 SET SCRIPT_PATH=%~dp0
 cd /D %SCRIPT_PATH%
 
+REM Samza version
+FOR /F "tokens=1,2* delims== eol=# " %%i in ('type "gradle.properties"') do (
+	if "%%i" == "SAMZA_VERSION" set SAMZA_VERSION=%%j
+)
+
 docker run ^
     -d ^
     --name samza ^
@@ -14,7 +19,7 @@ docker run ^
     -p 8032:8032 ^
     -p 8042:8042 ^
     -v %cd%:/workdir ^
-    gerardnico/samza-grid:1.0
+    gerardnico/samza-grid:%SAMZA_VERSION%
 
 
 REM where:
