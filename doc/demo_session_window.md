@@ -27,7 +27,7 @@ docker-samza-bash.bat
 docker-samza-bash.sh
 ```
 
-  * Create the source topi
+  * Create the source topic
 
 ```bash
 kafka-topics.sh --zookeeper localhost:2181 --create --topic pageview-session-input --partitions 2 --replication-factor 1
