@@ -21,13 +21,15 @@ The version of the components (Yarn, Zookeeper, Samza, Kafka) can be seen in the
      * Yarn: Run the [Web Session demo](./doc/demo_session_window.md)
 
 
-## TODO:
-
-  * [Hello Samza](doc/samza-hello.md)
-  * [Tutorial](http://samza.apache.org/learn/tutorials/latest/)
 
 ## Image
 
 The Yarn Application Master of Samza. Check the [Web Session demo](./doc/demo_session_window.md) on how to see it.
 
 <img src="doc/demo_session_window_application_master.png" alt="Application Master of Samza" >  
+
+
+## TODO:
+
+  * [Hello Samza](doc/samza-hello.md)
+  * [Tutorial](http://samza.apache.org/learn/tutorials/latest/)
