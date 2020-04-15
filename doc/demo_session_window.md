@@ -3,7 +3,7 @@
 ## About
 
 A demo on how to calculate [Web Session](https://gerardnico.com/marketing/analytics/session) on Yarn
-
+that was taken from the [hello samza repository](samza-hello.md)
 
 ## Prerequisites
 
