@@ -11,6 +11,7 @@ FOR /F "tokens=1,2* delims== eol=# " %%i in ('type "gradle.properties"') do (
 	if "%%i" == "WORK_DIR" set WORK_DIR=%%j
 )
 
+REM hostname is for the application master of yarn (by default it's the container id)
 docker run ^
     -d ^
     --name samza ^
@@ -21,6 +22,7 @@ docker run ^
     -p 8042:8042 ^
     -p 8088:8088 ^
     -v %cd%:%WORK_DIR% ^
+    --hostname localhost ^
     gerardnico/samza-grid:%SAMZA_VERSION%
 
 
