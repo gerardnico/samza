@@ -41,7 +41,7 @@ public class WordCount implements StreamApplication {
     //final Map<String, String> CONSUMER_CONFIGS = ImmutableMap.of("socket.timeout.ms", "10000");
 
     private static final String INPUT_STREAM_ID = "sample-text";
-    private static final String OUTPUT_STREAM_ID = "word-count-output-2";
+    private static final String OUTPUT_STREAM_ID = "word-count-output";
 
     @Override
     public void describe(StreamApplicationDescriptor streamApplicationDescriptor) {
@@ -98,7 +98,7 @@ public class WordCount implements StreamApplication {
                 ).map(windowPane -> {
 
                             String value = windowPane.getKey().getKey() + ": " + windowPane.getMessage().toString();
-                            System.out.println("Value" + value);
+                            System.out.println(value);
                             return KV.of(
                                     windowPane.getKey().getKey(), // Key
                                     value
@@ -120,7 +120,7 @@ public class WordCount implements StreamApplication {
     public static void main(String[] args) {
 
         String[] samzaArgs = {
-                "--config-path", Paths.get("src/main/config/word-count.properties").toUri().toString(),
+                "--config-path", Paths.get("src/main/config/local-word-count.properties").toUri().toString(),
                 "--config-factory", "org.apache.samza.config.factories.PropertiesConfigFactory"
         };
         CommandLine cmdLine = new CommandLine();

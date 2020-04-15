@@ -1,10 +1,12 @@
 apply plugin: 'idea'
 apply plugin: 'java'
 
-task wrapper(type: Wrapper) {
+wrapper {
     description = "Updates gradlew and supporting files."
+    distributionType = Wrapper.DistributionType.ALL
     gradleVersion = '4.9'
 }
+
 
 version = "$SAMZA_VERSION"
 
@@ -31,7 +33,6 @@ dependencies {
     compile(group: 'org.slf4j', name: 'slf4j-log4j12', version: "$SLF4J_VERSION")
 
 
-
     // Samza
     compile(group: 'org.apache.samza', name: 'samza-api', version: "$SAMZA_VERSION")
     compile(group: 'org.apache.samza', name: "samza-aws_${SCALA_VERSION}", version: "$SAMZA_VERSION")
@@ -42,7 +43,7 @@ dependencies {
     compile(group: 'org.apache.samza', name: "samza-kv-rocksdb_${SCALA_VERSION}", version: "$SAMZA_VERSION")
 
     // Exploded archive are unzipped in the bin directory of the distribution (ie shell script)
-    explode (group: 'org.apache.samza', name: 'samza-shell',  ext: 'tgz', classifier: 'dist', version: "$SAMZA_VERSION")
+    explode(group: 'org.apache.samza', name: 'samza-shell', ext: 'tgz', classifier: 'dist', version: "$SAMZA_VERSION")
 
     // Runtime dependency are unzipped in the lib directory of the distribution
     runtime(group: 'org.apache.samza', name: "samza-core_${SCALA_VERSION}", version: "$SAMZA_VERSION")
@@ -72,14 +73,15 @@ task distTar(dependsOn: build, type: Tar) {
     extension('tar.gz')
     into("config") {
         from("src/main/config") {
-            include "wikipedia-feed.properties"
-            include "wikipedia-parser.properties"
-            include "wikipedia-stats.properties"
-            include "wikipedia-application.properties"
+            //include "*.properties"
 
             // expand the Maven tokens with Gradle equivalents.  Also change 'target' (Maven) to 'build/distributions' (Gradle)
             filter { String line ->
-                line.replaceAll('[\$][{]basedir[}]', project.projectDir.toString()).replaceAll('[\$][{]project.artifactId[}]', project.name.toString()).replaceAll('/target/', '/build/distributions/').replaceAll('[\$][{]pom.version[}]', version)
+                line
+                        .replaceAll('[\$][{]basedir[}]', project.projectDir.toString())
+                        .replaceAll('[\$][{]project.artifactId[}]', project.name.toString())
+                        .replaceAll('/target/', '/build/distributions/')
+                        .replaceAll('[\$][{]pom.version[}]', version)
             }
         }
     }
@@ -116,6 +118,12 @@ class SamzaTask extends DefaultTask {
                     "--config-path=file://${project.projectDir}/deploy/samza/config/${configFile}")
         }
     }
+}
+
+// update the Samza job
+task deploy(dependsOn: [distTar], type: Sync) {
+    into(new File(project.projectDir, "/deploy/samza"))
+    from(tarTree(distTar.archivePath))
 }
 
 // helper to run the Samza job to retrieve Wikipedia data

@@ -1,5 +1,11 @@
 .gradle
 .idea
+# Build of gradle
 build
-# zk state
+# RocksDb state
 state
+# Deploy of the app
+deploy
+manifest.txt
+pathing.jar
+

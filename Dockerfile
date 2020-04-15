@@ -71,7 +71,6 @@ EXPOSE 8088
 ## listener kafka property is changed to 0.0.0.0 to answer on all interface and localhost for the client
 ##################################
 RUN	echo "==> Install Samza, Zookeeper, Kafka and Yarn " && \
-    $SAMZA_HOME/scripts/grid install samza && \
     $SAMZA_HOME/scripts/grid install zookeeper && \
     $SAMZA_HOME/scripts/grid install kafka && \
     $SAMZA_HOME/scripts/grid install yarn

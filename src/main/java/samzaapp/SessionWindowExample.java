@@ -65,7 +65,7 @@ import java.util.Map;
  *   </li>
  *   <li>
  *     Run the application using the run-app.sh script <br/>
- *     ./deploy/samza/bin/run-app.sh --config-factory=org.apache.samza.config.factories.PropertiesConfigFactory --config-path=file://$PWD/deploy/samza/config/session-window-example.properties
+ *     ./deploy/samza/bin/run-app.sh --config-factory=org.apache.samza.config.factories.PropertiesConfigFactory --config-path=file://$PWD/deploy/samza/config/yarn-session-window-example.properties
  *   </li>
  *   <li>
  *     Produce some messages to the "pageview-session-input" topic <br/>
@@ -74,7 +74,7 @@ import java.util.Map;
  *   </li>
  *   <li>
  *     Consume messages from the "pageview-session-output" topic (e.g. bin/kafka-console-consumer.sh)
- *     ./deploy/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic pageview-session-output --property print.key=true
+ *     kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic pageview-session-output --property print.key=true
  *   </li>
  * </ol>
  */
@@ -114,11 +114,18 @@ public class SessionWindowExample implements StreamApplication, Serializable {
                         kv -> kv.value,
                         pageViewKVSerde,
                         "pageview")
-                .window(Windows.keyedSessionWindow(kv -> kv.value.userId,
-                        Duration.ofSeconds(10), stringSerde, pageViewKVSerde), "usersession")
+                .window(
+                        Windows.keyedSessionWindow(
+                                kv -> kv.value.userId,
+                                Duration.ofSeconds(10),
+                                stringSerde,
+                                pageViewKVSerde
+                        ),
+                        "usersession")
                 .map(windowPane -> {
                     String userId = windowPane.getKey().getKey();
                     int views = windowPane.getMessage().size();
+                    System.out.println("UserId/Views: " + userId + "/" + views);
                     return KV.of(userId, new UserPageViews(userId, views));
                 })
                 .sendTo(userPageViews);
@@ -127,7 +134,7 @@ public class SessionWindowExample implements StreamApplication, Serializable {
     public static void main(String[] args) {
 
         String[] samzaArg = {
-                "--config-path", Paths.get("src/main/config/session-window-example.properties").toUri().toString(),
+                "--config-path", Paths.get("src/main/config/local-session-window-example.properties").toUri().toString(),
                 "--config-factory", "org.apache.samza.config.factories.PropertiesConfigFactory"
         };
         CommandLine cmdLine = new CommandLine();
@@ -137,5 +144,6 @@ public class SessionWindowExample implements StreamApplication, Serializable {
         LocalApplicationRunner runner = new LocalApplicationRunner(app, config);
         runner.run();
         runner.waitForFinish();
+
     }
 }
