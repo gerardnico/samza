@@ -81,7 +81,10 @@ grid
   $ grid stop [yarn|kafka|zookeeper|all]
 ```
 
+### Gui
 
+You can view the Samza jobs running in the YARN UI [http://localhost:8088/cluster/apps](http://localhost:8088/cluster/apps)
+ too.
 
 ## Code
 
@@ -109,16 +112,7 @@ kafka-console-consumer.sh --topic word-count-output --bootstrap-server localhost
 
 ### Hello Samza
 
-```bash
-git clone https://gitbox.apache.org/repos/asf/samza-hello-samza.git hello-samza
-cd hello-samza
-git checkout latest
-```
-
-Not yet done
-  * [Samza](http://samza.apache.org/learn/tutorials/latest/hello-samza-high-level-yarn.html)
-  * [Doc](http://samza.apache.org/startup/code-examples/latest/samza.html)
-  * [Hello Samza](http://samza.apache.org/startup/hello-samza/0.10/)
+[Hello Samza](doc/samza-hello.md)
   
 
 ### Tutorial

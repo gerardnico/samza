@@ -1,6 +1,5 @@
 apply plugin: 'idea'
 apply plugin: 'java'
-apply plugin:'application'
 
 task wrapper(type: Wrapper) {
     description = "Updates gradlew and supporting files."
@@ -14,28 +13,166 @@ repositories {
     mavenLocal()
 }
 
-// a configuration for dependencies that need exploding into package
+/**
+ * A configuration for dependencies that need exploding into package
+ * It's used to tag the samza-shell in order to put its content in the bin in the distribution tasks
+ *
+ */
+
 configurations {
     explode
 }
 
 dependencies {
     compile(group: 'org.codehaus.jackson', name: 'jackson-jaxrs', version: '1.9.13')
+
+    // Log
     compile(group: 'org.slf4j', name: 'slf4j-api', version: "$SLF4J_VERSION")
     compile(group: 'org.slf4j', name: 'slf4j-log4j12', version: "$SLF4J_VERSION")
-    compile(group: 'org.apache.zookeeper', name: 'zookeeper', version: "$ZK_VERSION")
+
+
+
+    // Samza
     compile(group: 'org.apache.samza', name: 'samza-api', version: "$SAMZA_VERSION")
-    compile(group: 'org.apache.samza', name: "samza-kv_${SCALA_VERSION}", version: "$SAMZA_VERSION")
+    compile(group: 'org.apache.samza', name: "samza-aws_${SCALA_VERSION}", version: "$SAMZA_VERSION")
+    compile(group: 'org.apache.samza', name: "samza-azure_${SCALA_VERSION}", version: "$SAMZA_VERSION")
     compile(group: 'org.apache.samza', name: "samza-kafka_${SCALA_VERSION}", version: "$SAMZA_VERSION")
-    compile(group: 'org.apache.samza', name: "samza-core_${SCALA_VERSION}", version: "$SAMZA_VERSION")
-    compile(group: 'org.apache.kafka', name: "kafka_${SCALA_VERSION}", version: "$KAFKA_VERSION")
+    compile(group: 'org.apache.samza', name: "samza-kv_${SCALA_VERSION}", version: "$SAMZA_VERSION")
+    compile(group: 'org.apache.samza', name: "samza-kv-couchbase_${SCALA_VERSION}", version: "$SAMZA_VERSION")
     compile(group: 'org.apache.samza', name: "samza-kv-rocksdb_${SCALA_VERSION}", version: "$SAMZA_VERSION")
 
+    // Exploded archive are unzipped in the bin directory of the distribution (ie shell script)
     explode (group: 'org.apache.samza', name: 'samza-shell',  ext: 'tgz', classifier: 'dist', version: "$SAMZA_VERSION")
 
-    //runtime(group: 'org.apache.samza', name: 'samza-log4j', version: "$SAMZA_VERSION")
+    // Runtime dependency are unzipped in the lib directory of the distribution
+    runtime(group: 'org.apache.samza', name: "samza-core_${SCALA_VERSION}", version: "$SAMZA_VERSION")
+    runtime(group: 'org.apache.samza', name: "samza-log4j2_${SCALA_VERSION}", version: "$SAMZA_VERSION")
     runtime(group: 'org.apache.samza', name: 'samza-shell', version: "$SAMZA_VERSION")
     runtime(group: 'org.apache.samza', name: "samza-yarn_${SCALA_VERSION}", version: "$SAMZA_VERSION")
+
+    // Non Samza-runtime
+    runtime(group: 'org.apache.kafka', name: "kafka_${SCALA_VERSION}", version: "$KAFKA_VERSION")
+    runtime(group: 'org.apache.zookeeper', name: 'zookeeper', version: "$ZK_VERSION")
+    runtime(group: 'org.apache.hadoop', name: 'hadoop-hdfs', version: "$HADOOP_VERSION")
+
+    // Test
+    testCompile(group: 'org.apache.samza', name: "samza-test_${SCALA_VERSION}", version: "$SAMZA_VERSION")
+    testCompile(group: 'junit', name: 'junit', version: "4.12")
+
 }
 
-mainClassName = "samzaapp.WordCount"
+
+/**
+ * Create the samza distribution .tgz file
+ */
+task distTar(dependsOn: build, type: Tar) {
+    destinationDir(new File(project.buildDir, "/distributions"))
+    compression(Compression.GZIP)
+    classifier('dist')
+    extension('tar.gz')
+    into("config") {
+        from("src/main/config") {
+            include "wikipedia-feed.properties"
+            include "wikipedia-parser.properties"
+            include "wikipedia-stats.properties"
+            include "wikipedia-application.properties"
+
+            // expand the Maven tokens with Gradle equivalents.  Also change 'target' (Maven) to 'build/distributions' (Gradle)
+            filter { String line ->
+                line.replaceAll('[\$][{]basedir[}]', project.projectDir.toString()).replaceAll('[\$][{]project.artifactId[}]', project.name.toString()).replaceAll('/target/', '/build/distributions/').replaceAll('[\$][{]pom.version[}]', version)
+            }
+        }
+    }
+
+    into("bin") {
+        from {
+            configurations.explode.collect { tarTree(it) }
+        }
+    }
+
+    into("lib") {
+        from configurations.runtime
+        from configurations.runtime.artifacts.files
+        from("src/main/resources/") {
+            include "log4j2.xml"
+        }
+    }
+}
+
+// ########################################
+// Samza helpers
+// ########################################
+
+// helper task to run Samza jobs
+class SamzaTask extends DefaultTask {
+    String configFile;
+
+    @TaskAction
+    def startSamza() {
+        project.exec {
+            workingDir(project.projectDir)
+            commandLine("deploy/samza/bin/run-job.sh",
+                    "--config-factory=org.apache.samza.config.factories.PropertiesConfigFactory",
+                    "--config-path=file://${project.projectDir}/deploy/samza/config/${configFile}")
+        }
+    }
+}
+
+// helper to run the Samza job to retrieve Wikipedia data
+//task runWikiFeed(dependsOn: [startGrid, deployHelloSamza], type: SamzaTask) {
+//    configFile("wikipedia-feed.properties")
+//}
+//
+//// helper to run the Samza job process Wikipedia data
+//task runWikiParser(dependsOn: [startGrid, deployHelloSamza], type: SamzaTask) {
+//    configFile("wikipedia-parser.properties")
+//}
+//
+//// helper to run the Samza job to summarize stats on Wikipedia edits
+//task runWikiStats(dependsOn: [startGrid, deployHelloSamza], type: SamzaTask) {
+//    configFile("wikipedia-stats.properties")
+//}
+
+
+// ###############################################
+// Kafka helpers
+// ###############################################
+
+// show all Kafka topics
+task listKafkaTopics(type: Exec) {
+    workingDir(project.projectDir)
+    commandLine("deploy/kafka/bin/kafka-topics.sh",
+            "--zookeeper", "localhost:2181",
+            "--list")
+}
+
+// helper task to monitor a Kafka topic
+class KafkaDumpTask extends DefaultTask {
+    String topic;
+
+    @TaskAction
+    def dumpTopic() {
+        project.exec {
+            workingDir(project.projectDir)
+            commandLine("deploy/kafka/bin/kafka-console-consumer.sh",
+                    "--zookeeper", "localhost:2181",
+                    "--topic", "${topic}")
+        }
+    }
+}
+
+// helper to dump the wikipedia-raw topic
+task dumpWikiRaw(type: KafkaDumpTask) {
+    topic("wikipedia-raw")
+}
+
+// helper to dump the wikipedia-edits topic
+task dumpWikiEdits(type: KafkaDumpTask) {
+    topic("wikipedia-edits")
+}
+
+// helper to dump the wikipedia-stats topic
+task dumpWikiStats(type: KafkaDumpTask) {
+    topic("wikipedia-stats")
+}
+

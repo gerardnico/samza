@@ -75,25 +75,20 @@ public class WordCount implements StreamApplication {
         System.out.println("Stream Processing");
         inputLines
                 .map(kv -> {
-                    System.out.println("Line: " + kv.value);
+                    // System.out.println("Line: " + kv.value);
                     return kv.value;
                 }) // return the lines
                 .flatMap(s -> {
                     List<String> split = Arrays.asList(s.split("\\W+"));
-                    System.out.println("Split: " + split);
                     return split;
                 }) // Split by space
-                .map(s -> {
-                    System.out.println(s);
-                    return s;
-                })
                 .window(
                         Windows.keyedSessionWindow(
                                 w -> w, // The key
                                 // Session Time Gap
                                 // A session is considered complete when no new messages arrive within the sessionGap.
                                 // All messages that arrive within the gap are grouped into the same session
-                                Duration.ofSeconds(60),
+                                Duration.ofSeconds(2),
                                 () -> 0, // initial value
                                 (m, prevCount) -> prevCount + 1, // agg function
                                 new StringSerde(), // Key Serde Object
@@ -101,18 +96,15 @@ public class WordCount implements StreamApplication {
                         ),
                         "count" // unique id of the operator
                 ).map(windowPane -> {
-                            System.out.println("Key" + windowPane.getKey().getKey());
+
+                            String value = windowPane.getKey().getKey() + ": " + windowPane.getMessage().toString();
+                            System.out.println("Value" + value);
                             return KV.of(
                                     windowPane.getKey().getKey(), // Key
-                                    windowPane.getKey().getKey() + ": " + windowPane.getMessage().toString() // Value
+                                    value
                             );
                         }
                 )
-//                .map(s -> {
-//                            System.out.println("Key" + s);
-//                            return KV.of(s,s);
-//                        }
-//                )
                 .sendTo(counts);
 
     }

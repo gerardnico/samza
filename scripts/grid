@@ -44,13 +44,13 @@ SAMZA_TAG=
 SCALA_VERSION=
 KAFKA_VERSION=
 ZK_VERSION=
-YARN_VERSION=
+HADOOP_VERSION=
 source $SCRIPT_DIR/../gradle.properties
 
 # File and URL
 KAFKA_PACKAGE="kafka_${SCALA_VERSION}-${KAFKA_VERSION}"
 DOWNLOAD_KAFKA="https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/${KAFKA_PACKAGE}.tgz"
-YARN_PACKAGE="hadoop-${YARN_VERSION}"
+YARN_PACKAGE="hadoop-${HADOOP_VERSION}"
 DOWNLOAD_YARN="https://archive.apache.org/dist/hadoop/common/${YARN_PACKAGE}/${YARN_PACKAGE}.tar.gz"
 ZOOKEEPER_PACKAGE="zookeeper-${ZK_VERSION}"
 DOWNLOAD_ZOOKEEPER="https://archive.apache.org/dist/zookeeper/${ZOOKEEPER_PACKAGE}/${ZOOKEEPER_PACKAGE}.tar.gz"
