@@ -4,7 +4,7 @@ apply plugin: 'java'
 wrapper {
     description = "Updates gradlew and supporting files."
     distributionType = Wrapper.DistributionType.ALL
-    gradleVersion = '4.9'
+    gradleVersion = '6.3'
 }
 
 
@@ -78,7 +78,7 @@ task distTar(dependsOn: build, type: Tar) {
             // expand the Maven tokens with Gradle equivalents.  Also change 'target' (Maven) to 'build/distributions' (Gradle)
             filter { String line ->
                 line
-                        .replaceAll('[\$][{]basedir[}]', project.projectDir.toString())
+                        .replaceAll('[\$][{]basedir[}]', "$WORK_DIR")
                         .replaceAll('[\$][{]project.artifactId[}]', project.name.toString())
                         .replaceAll('/target/', '/build/distributions/')
                         .replaceAll('[\$][{]pom.version[}]', version)

@@ -8,6 +8,7 @@ cd /D %SCRIPT_PATH%
 REM Samza version
 FOR /F "tokens=1,2* delims== eol=# " %%i in ('type "gradle.properties"') do (
 	if "%%i" == "SAMZA_VERSION" set SAMZA_VERSION=%%j
+	if "%%i" == "WORK_DIR" set WORK_DIR=%%j
 )
 
 docker run ^
@@ -19,7 +20,7 @@ docker run ^
     -p 8032:8032 ^
     -p 8042:8042 ^
     -p 8088:8088 ^
-    -v %cd%:/workdir ^
+    -v %cd%:%WORK_DIR% ^
     gerardnico/samza-grid:%SAMZA_VERSION%
 
 

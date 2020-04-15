@@ -16,7 +16,9 @@ The version of the components (Yarn, Zookeeper, Samza, Kafka) can be seen in the
 
   * Build and create the [docker Samza Grid container](./doc/samza-grid-docker.md)
   * Yarn ui should be available at [http://localhost:8088](http://localhost:8088)
-  * Run the [Word count demo](./doc/demo_word_count.md)
+  * Demo:
+     * Local: Run the [Word count demo](./doc/demo_word_count.md)
+     * Yarn: Run the [Web Session demo](./doc/demo_session_window.md)
 
 
 ## TODO:
