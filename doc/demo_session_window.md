@@ -46,5 +46,12 @@ kafka-topics.sh --zookeeper localhost:2181 --create --topic pageview-session-inp
 
   * Check that the app is in `RUNNING` state at [http://localhost:8088/cluster/apps](http://localhost:8088/cluster/apps)
  
+  * Produce some messages to the "pageview-session-input" topic 
+```bash
+kafka-console-producer.sh --topic pageview-session-input --broker-list localhost:9092 < ./data/pageview-session-input.jsonl
+```
 
-
+  * Consume messages from the "pageview-session-output" topic 
+```bash
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic pageview-session-output --property print.key=true --from-beginning
+```

@@ -89,6 +89,9 @@ public class SessionWindowExample implements StreamApplication, Serializable {
 
     @Override
     public void describe(StreamApplicationDescriptor streamApplicationDescriptor) {
+
+        System.out.println("Debug Trace: The session window example has started");
+
         Serde<String> stringSerde = new StringSerde();
         KVSerde<String, PageView> pageViewKVSerde = KVSerde.of(stringSerde, new JsonSerdeV2<>(PageView.class));
         KVSerde<String, UserPageViews> userPageViewSerde = KVSerde.of(stringSerde, new JsonSerdeV2<>(UserPageViews.class));
