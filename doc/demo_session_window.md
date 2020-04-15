@@ -47,7 +47,7 @@ kafka-topics.sh --zookeeper localhost:2181 --create --topic pageview-session-inp
   * Check that the app is in `RUNNING` state at [http://localhost:8088/cluster/apps](http://localhost:8088/cluster/apps)
   * Click on the Application Master link. You should get a similar web page.
   
-<img src="demo_session_window_application_master.png" alt="Application Master of Samza" height="400" width="324">
+<img src="demo_session_window_application_master.png" alt="Application Master of Samza">
  
  
   * Produce some messages to the "pageview-session-input" topic 
